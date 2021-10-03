@@ -6,6 +6,10 @@
         <name>Pivotal Education</name>
         <url>http://pivotal.io/training</url>
     </organization>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
     <packaging>jar</packaging>
     <parent>
         <groupId>io.pivotal.education.core-spring</groupId>
