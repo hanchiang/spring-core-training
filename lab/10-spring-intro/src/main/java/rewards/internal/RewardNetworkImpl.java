@@ -7,13 +7,9 @@ import rewards.RewardConfirmation;
 import rewards.RewardNetwork;
 import rewards.internal.account.Account;
 import rewards.internal.account.AccountRepository;
-import rewards.internal.account.Beneficiary;
 import rewards.internal.restaurant.Restaurant;
 import rewards.internal.restaurant.RestaurantRepository;
 import rewards.internal.reward.RewardRepository;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Rewards an Account for Dining at a Restaurant.
