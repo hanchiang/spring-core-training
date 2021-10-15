@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * execution.
  */
 
-// TODO-05: Review and run the testPropagation() method below.
+// 	TODO-05: Review and run the testPropagation() method below.
 //
 //  It uses a transaction-manager to implement transactions manually
 //  and runs rewardAccountFor() within a transaction then performs a manual rollback.
@@ -61,7 +61,7 @@ public class RewardNetworkPropagationTests {
 	public void testPropagation() {
 		// Open a transaction for testing
 		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-
+		
 		// Run the test - generate a reward
 		Dining dining = Dining.createDining("100.00", "1234123412341234", "1234567890");
 		rewardNetwork.rewardAccountFor(dining);
