@@ -3,6 +3,7 @@ package rewards.internal.account;
 import common.money.MonetaryAmount;
 import common.money.Percentage;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,8 +30,12 @@ public class JdbcAccountRepository implements AccountRepository {
 
 	private DataSource dataSource;
 
+	private JdbcTemplate jdbcTemplate;
+
 	public JdbcAccountRepository(DataSource dataSource) {
+
 		this.dataSource = dataSource;
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	// TODO-07 (Optional): Refactor this method using JdbcTemplate and ResultSetExtractor
@@ -46,43 +51,47 @@ public class JdbcAccountRepository implements AccountRepository {
 			"left outer join T_ACCOUNT_BENEFICIARY b " +
 			"on a.ID = b.ACCOUNT_ID " +
 			"where c.ACCOUNT_ID = a.ID and c.NUMBER = ?";
+
+		return jdbcTemplate.query(sql, rs -> {
+			return mapAccount(rs);
+		}, creditCardNumber);
 		
-		Account account = null;
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			conn = dataSource.getConnection();
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, creditCardNumber);
-			rs = ps.executeQuery();
-			account = mapAccount(rs);
-		} catch (SQLException e) {
-			throw new RuntimeException("SQL exception occurred finding by credit card number", e);
-		} finally {
-			if (rs != null) {
-				try {
-					// Close to prevent database cursor exhaustion
-					rs.close();
-				} catch (SQLException ex) {
-				}
-			}
-			if (ps != null) {
-				try {
-					// Close to prevent database cursor exhaustion
-					ps.close();
-				} catch (SQLException ex) {
-				}
-			}
-			if (conn != null) {
-				try {
-					// Close to prevent database connection exhaustion
-					conn.close();
-				} catch (SQLException ex) {
-				}
-			}
-		}
-		return account;
+//		Account account = null;
+//		Connection conn = null;
+//		PreparedStatement ps = null;
+//		ResultSet rs = null;
+//		try {
+//			conn = dataSource.getConnection();
+//			ps = conn.prepareStatement(sql);
+//			ps.setString(1, creditCardNumber);
+//			rs = ps.executeQuery();
+//			account = mapAccount(rs);
+//		} catch (SQLException e) {
+//			throw new RuntimeException("SQL exception occurred finding by credit card number", e);
+//		} finally {
+//			if (rs != null) {
+//				try {
+//					// Close to prevent database cursor exhaustion
+//					rs.close();
+//				} catch (SQLException ex) {
+//				}
+//			}
+//			if (ps != null) {
+//				try {
+//					// Close to prevent database cursor exhaustion
+//					ps.close();
+//				} catch (SQLException ex) {
+//				}
+//			}
+//			if (conn != null) {
+//				try {
+//					// Close to prevent database connection exhaustion
+//					conn.close();
+//				} catch (SQLException ex) {
+//				}
+//			}
+//		}
+//		return account;
 	}
 
 	// TODO-06: Refactor this method to use JdbcTemplate.
