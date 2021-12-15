@@ -1,9 +1,11 @@
 package config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //   annotation to this class
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity      // Redundant in Spring Boot app
 public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -35,7 +38,10 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
                 //   for "ADMIN" or "SUPERADMIN" role only
                 // - Allow GET on the /accounts resource (or any sub-resource)
                 //   for all roles - "USER", "ADMIN", "SUPERADMIN"
-
+                .mvcMatchers(HttpMethod.DELETE, "/accounts/**").hasRole("SUPERADMIN")
+                .mvcMatchers(HttpMethod.POST, "/accounts/**").hasAnyRole("SUPERADMIN", "ADMIN")
+                .mvcMatchers(HttpMethod.PUT, "/accounts/**").hasAnyRole("SUPERADMIN", "ADMIN")
+                .mvcMatchers(HttpMethod.GET, "/accounts/**").hasAnyRole("SUPERADMIN", "ADMIN", "USER")
                 // For all other URL's, make sure the caller is authenticated
                 .mvcMatchers("/**").authenticated()
                 .and()
@@ -55,8 +61,9 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
         // - "superadmin"/"superadmin" with "USER", "ADMIN", and "SUPERADMIN" roles
         // (Make sure to store the password in encoded form.)
         auth.inMemoryAuthentication()
-            .withUser("user").password(passwordEncoder.encode("user")).roles("USER").and()
-
+                .withUser("user").password(passwordEncoder.encode("user")).roles("USER").and()
+                .withUser("admin").password(passwordEncoder.encode("admin")).roles("USER", "ADMIN").and()
+                .withUser("superadmin").password(passwordEncoder.encode("superadmin")).roles("USER", "ADMIN", "SUPERADMIN")
         ;
 
         // TODO-14 (Optional): Add authentication based upon the custom UserDetailsService
